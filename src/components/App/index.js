@@ -11,6 +11,7 @@ import Login from "../Login";
 import Register from "../Login/Register";
 import Error404 from "./Error404";
 import About from "../About";
+import Search from "../Search";
 
 const App = () => {
     return <BrowserRouter>
@@ -20,6 +21,7 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about/:name" element={<About />} />
+                <Route path="/search" element={<Search />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="*" element={<Error404></Error404>} />

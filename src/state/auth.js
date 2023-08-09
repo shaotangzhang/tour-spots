@@ -18,23 +18,23 @@ export const isUserLogin = selector({
     get: ({ get }) => {
         const user = get(userInfo);
         const login = get(loginInfo);
-        return user?.username && (login?.expires > (new Date));
+        return user?.username && (login?.token) && (login?.expires > (new Date()));
     },
 });
 
 export function login(userInfo, token, expires) {
 
     if (typeof expires === 'number') {
-        const t = new Date;
+        const t = new Date();
         t.setTime(expires * 1000);
         expires = t;
     } else if (typeof expires === 'string') {
         expires = new Date(expires);
-    } else if (!(expires instanceof Date)) {
+    } else if (!(expires instanceof Date())) {
         expires = null;
     }
 
-    if (expires >= new Date) {
+    if (expires >= new Date()) {
         const AUTH = {
             userInfo,
             loginInfo: {
@@ -54,3 +54,13 @@ export function logout() {
     auth = null;
     localStorage.removeItem('auth');
 }
+
+const AuthState = {
+    login,
+    logout,
+    isLogin() {
+        return auth?.userInfo?.username && auth?.loginInfo?.token && (auth?.loginInfo?.expires > (new Date()));
+    }
+};
+
+export default AuthState;
