@@ -1,17 +1,11 @@
 import { Container, Navbar, Nav, NavDropdown } from "react-bootstrap";
-import classNames from "classnames";
-
-import styles from "./index.css";
-
-import { useRecoilValue } from 'recoil';
-import { isUserLogin } from "../../../state/auth";
+import AuthStore from "../../../stores/AuthStore";
+import "./index.css";
+import { observer } from 'mobx-react';
 
 const Header = () => {
 
-    const isLoggedIn = useRecoilValue(isUserLogin);
-
-    return <header className={classNames(styles.DEFAULT_CLASS, styles.EXTRA_CLASS)}>
-
+    return <header className="layout-header">
         <Navbar
             expand="lg"
             variant="light"
@@ -31,10 +25,10 @@ const Header = () => {
 
                     <Nav className="ms-auto">
                         {
-                            isLoggedIn
+                            AuthStore.isUserLoggedIn
                                 ? <>
-                                    <NavDropdown title="Dropdown" id="user-nav-dropdown">
-                                        <NavDropdown.Item href="/user">User profile</NavDropdown.Item>
+                                    <NavDropdown title="My Account" id="user-nav-dropdown">
+                                        <NavDropdown.Item href="/user/profile">User profile</NavDropdown.Item>
                                         <NavDropdown.Item href="/user/favourists">Favourists</NavDropdown.Item>
                                         <NavDropdown.Divider />
                                         <NavDropdown.Item href="/logout">Logout</NavDropdown.Item>
@@ -54,4 +48,4 @@ const Header = () => {
     </header>
 };
 
-export default Header;
+export default observer(Header);

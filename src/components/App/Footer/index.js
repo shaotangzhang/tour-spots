@@ -1,12 +1,11 @@
 import { Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-import styles from "./index.css";
-import classNames from "classnames";
+import "./index.css";
 
 const Footer = () => {
 
-    return <footer className={classNames(styles.DEFAULT_CLASS, 'bg-light mt-5 py-5 border-top', styles.EXTRA_CLASS)}>
+    return <footer className="layout-footer">
         <Container className="text-center">
             <p>
                 <Link to={'/about/terms-of-use'}>Terms of Use</Link> |

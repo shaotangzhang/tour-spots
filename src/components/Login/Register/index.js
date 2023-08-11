@@ -1,44 +1,34 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+import AuthStore from "../../../stores/AuthStore";
 import "./index.css";
-import AuthService from "../../../services/AuthService";
 
 const Register = ({ redirect }) => {
 
-    const [fullName, setFullName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+
     const [registerResult, setRegisterResult] = useState('');
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-        AuthService.register(email, password, fullName)
-            .then(res => {
-                if (res && res.userInfo && res.loginInfo) {
-                    if (!redirect) {
-                        redirect = '/user';
-                    }
+        const { email, password, fullName } = e.target.elements;
 
-                    if (typeof redirect === 'string') {
-                        if (redirect.startsWith('/')) {
-                            window.history.push(redirect);
-                        } else {
-                            window.location.href = redirect;
-                        }
+        AuthStore.syncRegister(email.value, password.value, fullName.value)
+            .then(() => {
+                setRegisterResult('Successfully registered.');
 
-                        return res;
-                    }
+                if (!redirect) {
+                    redirect = '/user';
+                }
 
-                    setRegisterResult('Successfully registered. please login.');
-                } else {
-                    setRegisterResult('Invalid information for registering an account.');
+                if (typeof redirect === 'string') {
+                    navigate(redirect);
                 }
             }).catch(ex => {
-                console.error(ex);
-                setRegisterResult('Failed to register');
+                setRegisterResult(String(ex || '') || 'Unknown error');
             });
-
-        return false;
     };
 
     return (
@@ -57,10 +47,9 @@ const Register = ({ redirect }) => {
                             <label htmlFor="fullName" className="form-label">Full Name</label>
                             <input
                                 type="text"
+                                name="fullName"
                                 className="form-control"
                                 id="fullName"
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
                                 required
                             />
                         </div>
@@ -68,10 +57,9 @@ const Register = ({ redirect }) => {
                             <label htmlFor="email" className="form-label">Email</label>
                             <input
                                 type="email"
+                                name="email"
                                 className="form-control"
                                 id="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
                                 required
                             />
                         </div>
@@ -79,10 +67,9 @@ const Register = ({ redirect }) => {
                             <label htmlFor="password" className="form-label">Password</label>
                             <input
                                 type="password"
+                                name="password"
                                 className="form-control"
                                 id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
                                 required
                             />
                         </div>

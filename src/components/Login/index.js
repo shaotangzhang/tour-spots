@@ -1,66 +1,58 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
+
+import AuthStore from "../../stores/AuthStore";
+import User from "../User";
 
 import "./index.css";
 
-import AuthService from "../../services/AuthService";
+export default function Login({ redirectUrl, ...rest }) {
 
-const Login = ({ redirect }) => {
+    const navigate = useNavigate();
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loginResult, setLoginResult] = useState('');
+    const [success, setSuccess] = useState(false);
+    const [loginResult, handleLoginResult] = useState('');
+    const [closeAlert, handleCloseAlert] = useState(true);
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
+    const handleSubmit = e => {
+        e.preventDefault();
+        e.stopPropagation();
 
-        AuthService.login(email, password)
-            .then(res => {
-                if (res && res.userInfo && res.loginInfo) {
-                    if (!redirect) {
-                        redirect = '/user';
-                    }
+        const { email, password } = e.target;
 
-                    if (typeof redirect === 'string') {
-                        if (redirect.startsWith('/')) {
-                            window.history.push(redirect);
-                        } else {
-                            window.location.href = redirect;
-                        }
-
-                        return res;
-                    }
-
-                    setLoginResult('Successfully logged in.');
-                } else {
-                    setLoginResult('Failed to login');
-                }
-            }).catch(ex => {
-                setLoginResult('Invalid username or password');
+        AuthStore.syncLogin(email.value, password.value)
+            .then(() => {
+                setSuccess(true);
+                navigate(redirectUrl || '/user');
+            })
+            .catch(ex => {
+                const loginResult = String(ex || '') || 'Unknown error';
+                handleLoginResult(loginResult);
+                handleCloseAlert(false);
             });
-
-        return false;
     };
 
-    return (
-        <div className="container bg-light p-5 mt-3">
+    return success
+        ? <User path={redirectUrl} {...rest}></User>
+        : <div className="container bg-light p-5 mt-3">
             <div className="row justify-content-center m-3">
                 <div className="col-md-6">
                     <h2 className="mb-4">User Login</h2>
-                    <div className='alert alert-danger alert-dismissible' role='alert' hidden={!loginResult}>
+                    <div className={`alert alert-${success ? 'success' : 'danger'} alert-dismissible`} role='alert' hidden={closeAlert}>
                         {loginResult}
-                        <button type="button" className="close btn-close" data-dismiss="alert" aria-label="Close" onClick={() => setLoginResult('')}>
+                        <button type="button" className="close btn-close" data-dismiss="alert" aria-label="Close" onClick={() => handleCloseAlert(true)}>
                             <span className='invisible' aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={e => handleSubmit(e)}>
                         <div className="mb-3">
                             <label htmlFor="email" className="form-label">Email</label>
                             <input
                                 type="email"
+                                name="email"
                                 className="form-control"
                                 id="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                autoComplete="off"
                                 required
                             />
                         </div>
@@ -70,8 +62,8 @@ const Login = ({ redirect }) => {
                                 type="password"
                                 className="form-control"
                                 id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                name="password"
+                                autoComplete="off"
                                 required
                             />
                         </div>
@@ -80,7 +72,4 @@ const Login = ({ redirect }) => {
                 </div>
             </div>
         </div>
-    );
-};
-
-export default Login;
+}
