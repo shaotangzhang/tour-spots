@@ -29,7 +29,6 @@ const Header = () => {
                                 ? <>
                                     <NavDropdown title="My Account" id="user-nav-dropdown">
                                         <NavDropdown.Item href="/user/profile">User profile</NavDropdown.Item>
-                                        <NavDropdown.Item href="/user/favourists">Favourists</NavDropdown.Item>
                                         <NavDropdown.Divider />
                                         <NavDropdown.Item href="/logout">Logout</NavDropdown.Item>
                                     </NavDropdown>

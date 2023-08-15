@@ -12,6 +12,7 @@ import Register from "../Login/Register";
 import Error404 from "./Error404";
 import About from "../About";
 import Search from "../Search";
+import SearchDetail from "../Search/SearchDetail";
 import User from "../User";
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/about/:name" element={<About />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/search/:xid" element={<SearchDetail />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/logout" element={<Logout />} />
                 <Route path="/register" element={<Register />} />

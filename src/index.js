@@ -25,4 +25,4 @@ if (process.env.NODE_ENV === 'production') {
   );
 }
 
-reportWebVitals(console.log);
+// reportWebVitals(console.log);

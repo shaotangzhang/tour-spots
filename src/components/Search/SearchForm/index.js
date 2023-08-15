@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import "./index.css";
 
-export default function SearchForm({ search, country, countries, onSearch }) {
+import OpenTripMap from "../../../services/OpenTripMap";
+
+const COUNTRIES = [
+    { code: 'au', text: 'Australia' },
+    { code: 'us', text: 'United States' }
+];
+
+export default function SearchForm({ search, country, countries, onSearch, showExtra }) {
 
     const [keyword, setKeyword] = useState(search || '');
     const [region, setRegion] = useState(country || 'au');
@@ -9,16 +16,25 @@ export default function SearchForm({ search, country, countries, onSearch }) {
     useEffect(function () {
         setKeyword(search);
         setRegion(country);
-    }, [search, country]);   
+        onSearch(search, country);
+    }, [search, country]);
 
     const handleFormSearch = e => {
-        if (typeof onSearch === "function") {
-            e.preventDefault();
-            e.stopPropagation();
-            return onSearch(e);
-        } else {
-            return true;
+
+        const { search, country } = e.target;
+
+        if (typeof onSearch === 'function') {
+            return onSearch(search, country, e);
         }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        setKeyword(search.value);
+        setRegion(country.value);
+        onSearch(search.value, country.value);
+
+        return false;
     };
 
     return <form
@@ -27,7 +43,7 @@ export default function SearchForm({ search, country, countries, onSearch }) {
         onSubmit={handleFormSearch}
         className="d-flex justify-content-center align-items-center p-5 m-3">
 
-        <div className="row g-1 p-4 w-75 rounded-3 search_form_body">
+        <div className="row g-1 p-4 rounded-3 search_form_body">
             <h6 className="text-muted">Search for tour spots:</h6>
             <div className="col-12 col-md-7">
                 <input
@@ -42,7 +58,7 @@ export default function SearchForm({ search, country, countries, onSearch }) {
             <div className="col-12 col-md-3">
                 <select className="form-select" name="country" value={region || ''} onChange={e => setRegion(e.target.value)}>
                     {
-                        countries.map(({ text, code }) => <option key={code} value={code}>{text}</option>)
+                        (countries || COUNTRIES).map(({ text, code }) => <option key={code} value={code}>{text}</option>)
                     }
                 </select>
             </div>
@@ -51,5 +67,10 @@ export default function SearchForm({ search, country, countries, onSearch }) {
             </div>
         </div>
 
+        <div hidden={!showExtra}>
+            {
+                OpenTripMap.getValidSearches().map(value => <span>{value}</span>)
+            }
+        </div>
     </form>
 };

@@ -1,49 +1,89 @@
 import { useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
+import SearchForm from "./SearchForm";
 
 import "./index.css";
 
-import GridView from "../Home/GridView";
-import SearchForm from "./SearchForm";
-import { useEffect, useState } from 'react';
+import OpenTripMap from '../../services/OpenTripMap';
+import GridView from '../Home/GridView';
 
-const countries = [
-    { code: 'au', text: 'Australia' },
-    { code: 'us', text: 'United States' }
-];
-
-const Search = () => {
-
+export default function Search() {
     const location = useLocation();
+
     const [country, setCountry] = useState('au');
     const [search, setSearch] = useState('');
     const [searchResult, setSearchResult] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     useEffect(function () {
         const params = new URLSearchParams(location.search);
-        const search = params.get('search');
-        const country = params.get('country');
-        setCountry(country);
-        setSearch(search);
+        setCountry(params.get('country'));
+        setSearch(params.get('search'));
+        setCurrentPage(parseInt(params.get('page')) || 1);
     }, [location.search]);
 
     useEffect(function () {
+        setCurrentPage(1);
+        handleSearch(search, country);
+    }, [search, country]);
+
+    let timer;
+
+    const handleSearch = (search, country, radius, page) => {
+
         if (!search || !country) {
             setSearchResult(null);
-        } else {
-            setSearchResult([1, 2, 3]);
+            setLoading(false);
+            return;
         }
-    }, [search, country]);
+
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+            setLoading(true);
+
+            OpenTripMap.search({ search, country, radius: radius || 25000, limit: 12, page })
+                .then(result => {
+                    const list = [...searchResult || []];
+                    result.items.forEach(item => list.find(e => (e.xid === item.xid) || (e.name === item.name) || (e.image && (e.image === item.image))) || list.push(item));
+                    setSearchResult(list);
+                })
+                // .catch(ex => alert(ex), setSearchResult(null))
+                .finally(() => {
+                    setLoading(false);
+                });
+        }, 500);
+    };
+
+    const handleLoadMore = () => {
+        setLoading(true);
+        const page = currentPage;
+        setCurrentPage(page + 1);
+        handleSearch(search, country, null, page + 1);
+    };
 
     return <>
         <div className='container rounded-3 bg-light mb-5'>
-            <SearchForm countries={countries} country={country} search={search}></SearchForm>
+            <SearchForm country={country} search={search} onSearch={handleSearch} showExtra={true}></SearchForm>
         </div>
 
-        <section className="container mb-5" hidden={!searchResult}>
-            <h5 className="mb-3">Search results</h5>
-            <GridView max={24}></GridView>
-        </section>
+        <div className='container mb-3'>
+
+            <div className='bg-light p-3' hidden={!loading}>
+                <span className="spinner-border spinner-border-sm me-3" aria-hidden="true"></span>
+                <span role="status">Searching...</span>
+            </div>
+
+            {
+                (searchResult?.length > 0)
+                    ? <GridView items={searchResult}></GridView>
+                    : (loading ? '' : <p>Not found any spots.</p>)
+            }
+
+            <div hidden={loading || !searchResult?.length}>
+                <button className='btn d-block btn-outline-secondary w-75 mx-auto' type='button' onClick={() => handleLoadMore()}>Load More</button>
+            </div>
+        </div>
     </>
 };
-
-export default Search;

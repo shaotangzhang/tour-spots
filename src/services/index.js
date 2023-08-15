@@ -1,5 +1,9 @@
+// import CryptoJS from "crypto-js";
+
 import { getStoredObject, setStoredObject, isExpired } from "./storage";
 
+// const API_PROXY_HOST = 'http://tour-spots.top';
+// const API_PROXY_USER = 'tour-spots.github'
 const API_PROXY_HOST = process.env.REACT_APP_API_PROXY_HOST;
 const API_PROXY_USER = process.env.REACT_APP_API_PROXY_USER;
 const API_PROXY_PASS = process.env.REACT_APP_API_PROXY_PASS;
@@ -48,7 +52,7 @@ async function ip() {
 /**
  * Returns the (cached) current ip address of the client end
  */
-export async function getCurrentIpAddress() {
+export async function getCurrentIpInfo() {
     return INFO.ip ? INFO : await ip();
 }
 
@@ -99,7 +103,7 @@ export function createProxyFetch(provider, context) {
 
         url = httpBuildUrl(url, options?.args);
 
-        if(options.body && !options.method) {
+        if (options.body && !options.method) {
             options.method = 'POST';
         }
 
@@ -142,6 +146,12 @@ export function httpBuildUrl(url, args) {
  */
 export function httpBuildQuery(params) {
     const search = new URLSearchParams();
-    Object.keys(params || {}).forEach(key => search.append(key, params[key]));
+    Object.keys(params || {}).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null) {
+            search.append(key, params[key])
+        }else{
+            search.delete(key);
+        }
+    });
     return search;
 }

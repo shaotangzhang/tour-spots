@@ -1,47 +1,21 @@
 // import classNames from "classnames";
 // import styles from "./index.css";
+import GridItem from "./GridItem";
 
-import Card from 'react-bootstrap/Card';
-import CardGroup from 'react-bootstrap/CardGroup';
+export default function GridView({ items, maxCount=500 }) {
 
-export default function GridView() {
-
-    return <CardGroup>
-        <Card>
-            <Card.Img variant="top" src="https://placehold.co/600x400" />
-            <Card.Body>
-                <Card.Text>Card title</Card.Text>
-            </Card.Body>
-            <Card.Footer>
-                <small className="text-muted">Last updated 3 mins ago</small>
-            </Card.Footer>
-        </Card>
-        <Card>
-            <Card.Img variant="top" src="https://placehold.co/600x400" />
-            <Card.Body>
-                <Card.Text>Card title</Card.Text>
-            </Card.Body>
-            <Card.Footer>
-                <small className="text-muted">Last updated 3 mins ago</small>
-            </Card.Footer>
-        </Card>
-        <Card>
-            <Card.Img variant="top" src="https://placehold.co/600x400" />
-            <Card.Body>
-                <Card.Text>Card title</Card.Text>
-            </Card.Body>
-            <Card.Footer>
-                <small className="text-muted">Last updated 3 mins ago</small>
-            </Card.Footer>
-        </Card>
-        <Card>
-            <Card.Img variant="top" src="https://placehold.co/600x400" />
-            <Card.Body>
-                <Card.Text>Card title</Card.Text>
-            </Card.Body>
-            <Card.Footer>
-                <small className="text-muted">Last updated 3 mins ago</small>
-            </Card.Footer>
-        </Card>
-    </CardGroup>
+    return <div className='row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4'>
+        {
+            (items||[]).filter(item=>item.xid && item.name).slice(0, maxCount).map(item => <div className='col mb-3' key={item.xid}>
+                <GridItem
+                    xid={item.xid}
+                    image={item.preview?.source}
+                    title={(item.wikipedia_extracts?.title || '').replace(/[a-z]+\:/, '') || item.name}
+                    description={item.info || item.wikipedia_extracts?.text}
+                    rating={item.rate}
+                    country={item.address?.country}
+                />
+            </div>)
+        }
+    </div>
 };
