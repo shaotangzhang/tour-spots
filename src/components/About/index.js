@@ -25,7 +25,7 @@ const About = () => {
 
     }, [name]);
 
-    return <Container>{document || 'Page is not found'}</Container>
+    return <Container data-testid='About page'>{document || 'Page is not found'}</Container>
 };
 
 export default About;

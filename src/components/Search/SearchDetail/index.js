@@ -87,7 +87,7 @@ export default function SearchDetail({ xid }) {
     }
 
     return <>
-        <div className="bg-light p-4 mb-3">
+        <div className="bg-light p-4 mb-3" data-testid="Search detail">
             <div className="container">
                 <div className="float-end" hidden={inFavor===null}>
                 {

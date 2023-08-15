@@ -1,6 +1,6 @@
 const CACHE = {};
-const CACHE_CLEAN_INTERVAL = 10 * 60 * 1000; // 10分钟的毫秒数
-let lastCacheCleanupTime = Date.now();
+// const CACHE_CLEAN_INTERVAL = 10 * 60 * 1000; // 10分钟的毫秒数
+// let lastCacheCleanupTime = Date.now();
 
 export function isExpired(expires) {
     if (typeof expires === 'number') {
@@ -79,33 +79,33 @@ const Storage = {
 export default Storage;
 
 // automatically cleanup cached objects that are expired.
-function gcCachedObjects() {
-    const keys = localStorage.getItem('[$cached-keys$]').split(',');
-    keys.forEach(key => {
-        if (!hasCachedObject(key)) {
-            removeCachedObject(key);
-        }
-    });
+// function gcCachedObjects() {
+//     const keys = localStorage.getItem('[$cached-keys$]').split(',');
+//     keys.forEach(key => {
+//         if (!hasCachedObject(key)) {
+//             removeCachedObject(key);
+//         }
+//     });
 
-    for (const key in CACHE) {
-        if (!hasCachedObject(key)) {
-            removeCachedObject(key);
-        }
-    }
-}
+//     for (const key in CACHE) {
+//         if (!hasCachedObject(key)) {
+//             removeCachedObject(key);
+//         }
+//     }
+// }
 
-function processIdleTasks(deadline) {
-    while (deadline.timeRemaining() > 0
-        && (Date.now() - lastCacheCleanupTime >= CACHE_CLEAN_INTERVAL)) {
+// function processIdleTasks(deadline) {
+//     while (deadline.timeRemaining() > 0
+//         && (Date.now() - lastCacheCleanupTime >= CACHE_CLEAN_INTERVAL)) {
 
-        gcCachedObjects();
+//         gcCachedObjects();
 
-        lastCacheCleanupTime = Date.now();
-    }
+//         lastCacheCleanupTime = Date.now();
+//     }
 
-    if ((Date.now() - lastCacheCleanupTime) >= CACHE_CLEAN_INTERVAL) {
-        requestIdleCallback(processIdleTasks);
-    }
-}
+//     if ((Date.now() - lastCacheCleanupTime) >= CACHE_CLEAN_INTERVAL) {
+//         requestIdleCallback(processIdleTasks);
+//     }
+// }
 
-requestIdleCallback(processIdleTasks);
+// window.requestIdleCallback(processIdleTasks);

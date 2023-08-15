@@ -1,29 +1,13 @@
 import { render, screen } from '@testing-library/react';
-import MyComponent from './index';
+import SearchForm from './index';
 
-describe('Unit test: ' + (MyComponent.constructor?.name || MyComponent.name), () => {
-
-    beforeAll(() => {
-        
-    });
-
-    beforeEach(() => {
-
-    });
-
-    afterEach(() => {
-
-    });
-
-    afterAll(() => {
-
-    });
+describe('Unit test: Search form', () => {
 
     test('Test for rendering', () => {
-        render(<MyComponent />);
+        render(<SearchForm />);
 
         // Do some tests here  
-        //   const linkElement = screen.getByText(/learn react/i);
-        //   expect(linkElement).toBeInTheDocument();
+          const testElement = screen.getByText(/Search for tour spots:/i);
+          expect(testElement).toBeInTheDocument();
     });
 });

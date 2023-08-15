@@ -64,7 +64,7 @@ export default function Search() {
     };
 
     return <>
-        <div className='container rounded-3 bg-light mb-5'>
+        <div className='container rounded-3 bg-light mb-5' data-testid="Search page">
             <SearchForm country={country} search={search} onSearch={handleSearch} showExtra={true}></SearchForm>
         </div>
 

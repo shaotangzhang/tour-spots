@@ -1,4 +1,4 @@
-import { useLocation } from "react-router";
+// import { useLocation } from "react-router";
 import "./index.css";
 import Auth from "../../services/Auth";
 import AuthStore from "../../stores/AuthStore";
@@ -10,12 +10,11 @@ import OpenTripMap from "../../services/OpenTripMap";
 import { useState } from "react";
 
 const User = () => {
-    const location = useLocation();
 
     if (Auth.isUserLogin()) {
 
         return <Container>
-            <h3 className="mt-3">My account</h3>
+            <h3 className="mt-3" data-testid="User page">My account</h3>
             <Routes>
                 <Route path="/" element={<UserProfile />} />
                 <Route path="profile" element={<UserProfile />} />
@@ -25,7 +24,7 @@ const User = () => {
         </Container>
     }
 
-    return <Login redirectUrl={location.pathname}></Login>
+    return <Login></Login>
 };
 
 const UserPageNotFound = () => {
@@ -61,7 +60,7 @@ const UserProfile = () => {
             <div className="list-group">
                 {
                     (list || []).map(item => <div className="list-group-item d-flex justify-content-between align-items-center" key={item.xid}>
-                        <img src={item.preview?.source} className="img-thumbnail me-3" style={{width: 100}}/>
+                        <img src={item.preview?.source} className="img-thumbnail me-3" alt={item.name} style={{width: 100}}/>
                         <div className="flex-grow-1">
                             <h6><a href={`/search/${item.xid}`} target={item.xid}>{item.name}, {item.address?.country}</a></h6>
                             <div>{item.point?.lon}, {item.point?.lat}</div>

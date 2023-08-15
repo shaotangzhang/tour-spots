@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import MyComponent from './index';
+import Home from './index';
 
-describe('Unit test: ' + (MyComponent.constructor?.name || MyComponent.name), () => {
+describe('Unit test: Home page', () => {
 
     beforeAll(() => {
         
@@ -20,10 +20,9 @@ describe('Unit test: ' + (MyComponent.constructor?.name || MyComponent.name), ()
     });
 
     test('Test for rendering', () => {
-        render(<MyComponent />);
+        render(<Home />);
 
-        // Do some tests here  
-        //   const linkElement = screen.getByText(/learn react/i);
-        //   expect(linkElement).toBeInTheDocument();
+        const labelElement = screen.getByTestId('Home page');
+        expect(labelElement).toBeInTheDocument();
     });
 });

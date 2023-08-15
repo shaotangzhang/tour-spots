@@ -1,4 +1,5 @@
 import { createProxyFetch, getCurrentIpInfo, HTTP_JSON_HEADERS } from ".";
+import Auth from "./Auth";
 import Storage from "./storage";
 
 const DEFAULT_LANG = 'en';
@@ -6,22 +7,34 @@ const DEFAULT_COUNTRY = 'au';
 
 const cache = new WeakMap();
 const proxy = createProxyFetch('opentripmap', HTTP_JSON_HEADERS);
-const favourists = Storage.getObject('opentripmap.favourists') || {};
+const allFavorists = {};
+
+// const favourists = Storage.getObject('opentripmap.favourists') || {};
 const validPlaces = Storage.getObject('opentripmap.validPlaces') || [];
 const validSearches = Storage.getObject('opentripmap.validSearches') || [];
 
-function findInCache(...keys) {
-    const key = keys.join('::');
-    if (key in cache) {
-        return cache[key];
+function initFavors() {
+    const username = Auth.getUserInfo()?.username;
+    if (username) {
+        if (!(username in allFavorists)) {
+            allFavorists[username] = Storage.getObject('opentripmap.favourists.' + username);
+        }
+        return allFavorists[username];
     }
-    return void 0;
 }
 
-function saveToCache(data, ...keys) {
-    const key = keys.join('::');
-    return cache[key] = data;
-}
+// function findInCache(...keys) {
+//     const key = keys.join('::');
+//     if (key in cache) {
+//         return cache[key];
+//     }
+//     return void 0;
+// }
+
+// function saveToCache(data, ...keys) {
+//     const key = keys.join('::');
+//     return cache[key] = data;
+// }
 
 async function cacheOrFetch(callback, ...keys) {
     const key = keys.join('::');
@@ -40,14 +53,14 @@ async function cacheOrFetch(callback, ...keys) {
     return cache[key] = callback;
 }
 
-function getRoughlyPoint(x, y, r) {
-    if (r <= 0) {
-        throw new TypeError('Invalid radius.');
-    }
+// function getRoughlyPoint(x, y, r) {
+//     if (r <= 0) {
+//         throw new TypeError('Invalid radius.');
+//     }
 
-    const ratio = 111111 / r;
-    return [(Math.floor(x / ratio) * ratio).toFixed(6), (Math.floor(y / ratio) * ratio).toFixed(6)];
-}
+//     const ratio = 111111 / r;
+//     return [(Math.floor(x / ratio) * ratio).toFixed(6), (Math.floor(y / ratio) * ratio).toFixed(6)];
+// }
 
 function getPointRange(x, y, r) {
     const ratio = 111111 / r;
@@ -297,7 +310,7 @@ const OpenTripMap = {
             return parseInt(b.rate) - parseInt(a.rate);
         });
 
-        const item = result.items[Math.floor(Math.random() * Math.min(10, result.items.length))] || result.items[0];
+        const item = result.items[0];
         return this.xid(item.xid);
     },
 
@@ -316,28 +329,43 @@ const OpenTripMap = {
         return validSearches;
     },
 
+    getFavors() {
+        const list = initFavors();
+        return Object.values(list || {}).filter(item => item.xid);
+    },
+
     inFavor(xid) {
-        return xid && (xid in favourists);
+        return xid && (xid in (initFavors() || {}));
     },
 
     addToFavor(item) {
-        if (!this.inFavor(item?.xid)) {
-            favourists[item.xid] = item;
-            Storage.setObject('opentripmap.favourists', favourists);
+        const username = Auth.getUserInfo()?.username;
+        if (username) {
+            if (!allFavorists[username]) {
+                allFavorists[username] = {};
+            }
+
+            if (item?.xid && !(item.xid in allFavorists[username])) {
+                allFavorists[username][item.xid] = item;
+                Storage.setObject('opentripmap.favourists.' + username, allFavorists[username]);
+            }
         }
     },
 
     removeFavor(xid) {
-        xid = xid?.xid || xid;
-        if (this.inFavor(xid)) {
-            delete favourists[xid];
-            Storage.setObject('opentripmap.favourists', favourists);
+
+        if (xid) {
+            const username = Auth.getUserInfo()?.username;
+            if (username) {
+                if (username in allFavorists) {
+                    if (xid in allFavorists[username]) {
+                        delete allFavorists[username][xid];
+                        Storage.setObject('opentripmap.favourists.' + username, allFavorists[username]);
+                    }
+                }
+            }
         }
     },
-
-    getFavors() {
-        return Object.values(favourists).filter(item=>item.xid);
-    }
 };
 
 export default OpenTripMap;

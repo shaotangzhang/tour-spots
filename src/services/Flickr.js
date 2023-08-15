@@ -1,23 +1,22 @@
-import { createProxyFetch, getCurrentIpInfo, HTTP_JSON_HEADERS } from ".";
-import Storage from "./storage";
+import { createProxyFetch, HTTP_JSON_HEADERS } from ".";
 
 const DEFAULT_LANG = 'en';
 
 const cache = new WeakMap();
 const proxy = createProxyFetch('flickr', HTTP_JSON_HEADERS);
 
-function findInCache(...keys) {
-    const key = keys.join('::');
-    if (key in cache) {
-        return cache[key];
-    }
-    return void 0;
-}
+// function findInCache(...keys) {
+//     const key = keys.join('::');
+//     if (key in cache) {
+//         return cache[key];
+//     }
+//     return void 0;
+// }
 
-function saveToCache(data, ...keys) {
-    const key = keys.join('::');
-    return cache[key] = data;
-}
+// function saveToCache(data, ...keys) {
+//     const key = keys.join('::');
+//     return cache[key] = data;
+// }
 
 async function cacheOrFetch(callback, ...keys) {
     const key = keys.join('::');
@@ -45,16 +44,16 @@ function getRoughlyPoint(x, y, r) {
     return [(Math.floor(x / ratio) * ratio).toFixed(6), (Math.floor(y / ratio) * ratio).toFixed(6)];
 }
 
-function getPointRange(x, y, r) {
-    const ratio = 111111 / r;
-    const half = r / 111111 / 2;
-    const lon_min = Math.floor((x - half) * ratio) / ratio;
-    const lon_max = Math.floor((x + half) * ratio) / ratio;
-    const lat_min = Math.floor((y - half) * ratio) / ratio;
-    const lat_max = Math.floor((y + half) * ratio) / ratio;
+// function getPointRange(x, y, r) {
+//     const ratio = 111111 / r;
+//     const half = r / 111111 / 2;
+//     const lon_min = Math.floor((x - half) * ratio) / ratio;
+//     const lon_max = Math.floor((x + half) * ratio) / ratio;
+//     const lat_min = Math.floor((y - half) * ratio) / ratio;
+//     const lat_max = Math.floor((y + half) * ratio) / ratio;
 
-    return [lon_min.toFixed(6), lon_max.toFixed(6), lat_min.toFixed(6), lat_max.toFixed(6)];
-}
+//     return [lon_min.toFixed(6), lon_max.toFixed(6), lat_min.toFixed(6), lat_max.toFixed(6)];
+// }
 
 const Flickr = {
 

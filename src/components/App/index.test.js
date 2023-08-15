@@ -1,29 +1,13 @@
 import { render, screen } from '@testing-library/react';
-import MyComponent from './index';
+import App from './index';
 
-describe('Unit test: ' + (MyComponent.constructor?.name || MyComponent.name), () => {
-
-    beforeAll(() => {
-        
-    });
-
-    beforeEach(() => {
-
-    });
-
-    afterEach(() => {
-
-    });
-
-    afterAll(() => {
-
-    });
+describe('Unit test: App page', () => {
 
     test('Test for rendering', () => {
-        render(<MyComponent />);
+        render(<App />);
 
         // Do some tests here  
-        //   const linkElement = screen.getByText(/learn react/i);
-        //   expect(linkElement).toBeInTheDocument();
+          const testElement = screen.getByTestId('App main');
+          expect(testElement).toBeInTheDocument();
     });
 });

@@ -1,29 +1,14 @@
 import { render, screen } from '@testing-library/react';
-import MyComponent from './index';
+import Header from './index';
 
-describe('Unit test: ' + (MyComponent.constructor?.name || MyComponent.name), () => {
+describe('Unit test: Header', () => {
 
-    beforeAll(() => {
-        
-    });
-
-    beforeEach(() => {
-
-    });
-
-    afterEach(() => {
-
-    });
-
-    afterAll(() => {
-
-    });
 
     test('Test for rendering', () => {
-        render(<MyComponent />);
+        render(<Header />);
 
         // Do some tests here  
-        //   const linkElement = screen.getByText(/learn react/i);
-        //   expect(linkElement).toBeInTheDocument();
+          const linkElement = screen.getByText(/Tour Spots/i);
+          expect(linkElement).toBeInTheDocument();
     });
 });

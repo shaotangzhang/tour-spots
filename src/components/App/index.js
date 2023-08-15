@@ -18,7 +18,7 @@ import User from "../User";
 const App = () => {
     return <BrowserRouter>
         <Header></Header>
-        <main className="layout-body">
+        <main className="layout-body" data-testid="App main">
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/about/:name" element={<About />} />
