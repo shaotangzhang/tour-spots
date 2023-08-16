@@ -1,89 +1,104 @@
-import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router';
 
-import SearchForm from "./SearchForm";
+import GridItem from "../Place/GridItem";
 
 import "./index.css";
 
-import OpenTripMap from '../../services/OpenTripMap';
-import GridView from '../Home/GridView';
+import { searchPlaces } from "../../services/Places";
 
 export default function Search() {
-    const location = useLocation();
 
-    const [country, setCountry] = useState('au');
-    const [search, setSearch] = useState('');
-    const [searchResult, setSearchResult] = useState(null);
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+
+    const [kinds, setKinds] = useState(params.get('kinds'));
+    const [search, setSearch] = useState(params.get('search') || '');
+    const [country, setCountry] = useState(params.get('country') || 'au');
+
+    const [searchResult, setSearchResult] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState();
+    const [hasMore, setHasMore] = useState(true);
 
     useEffect(function () {
         const params = new URLSearchParams(location.search);
-        setCountry(params.get('country'));
-        setSearch(params.get('search'));
-        setCurrentPage(parseInt(params.get('page')) || 1);
+        setSearch(params.get('search') || '');
+        setCountry(params.get('country') || 'au');
+        setKinds(params.get('kinds'));
     }, [location.search]);
+
+    let timer;
+    const handleSearch = (search, country, page, kinds) => {
+        setSearch(search);
+        setCountry(country);
+
+        if (String(search || '').trim().length > 2) {
+            if (String(country || '').trim().length === 2) {
+                setLoading(true);
+
+                if (timer) clearTimeout(timer);
+                timer = setTimeout(() => {
+                    const limit = 12;
+                    searchPlaces({ search, country, radius: 10000, kinds, limit, page })
+                        .then(result => {
+                            setCurrentPage(parseInt(result?.page) || 1);
+                            setHasMore((result.limit * result.page) < result.total);
+
+                            const list = searchResult;
+                            (result.items || []).forEach(item => list.find(m => m.xid === item.id) || list.push(item));
+                            setSearchResult(list);
+                        })
+                        .finally(() => {
+                            setLoading(false);
+                        });
+                }, 500);
+
+                return;
+            }
+        }
+    }
+
+    const handleLoadMore = () => {
+        if (hasMore) {
+            handleSearch(search, country, currentPage + 1, kinds);
+        }
+    }
 
     useEffect(function () {
         setCurrentPage(1);
-        handleSearch(search, country);
-    }, [search, country]);
+        handleLoadMore();
+    }, [search, country, kinds]);
 
-    let timer;
+    return <div className='container mt-4' data-testid="Search page">
 
-    const handleSearch = (search, country, radius, page) => {
+        <h3 className='mb-4'>Search result of "{search}, {country}"</h3>
 
-        if (!search || !country) {
-            setSearchResult(null);
-            setLoading(false);
-            return;
-        }
-
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(() => {
-            setLoading(true);
-
-            OpenTripMap.search({ search, country, radius: radius || 25000, limit: 12, page })
-                .then(result => {
-                    const list = [...searchResult || []];
-                    result.items.forEach(item => list.find(e => (e.xid === item.xid) || (e.name === item.name) || (e.image && (e.image === item.image))) || list.push(item));
-                    setSearchResult(list);
-                })
-                // .catch(ex => alert(ex), setSearchResult(null))
-                .finally(() => {
-                    setLoading(false);
-                });
-        }, 500);
-    };
-
-    const handleLoadMore = () => {
-        setLoading(true);
-        const page = currentPage;
-        setCurrentPage(page + 1);
-        handleSearch(search, country, null, page + 1);
-    };
-
-    return <>
-        <div className='container rounded-3 bg-light mb-5' data-testid="Search page">
-            <SearchForm country={country} search={search} onSearch={handleSearch} showExtra={true}></SearchForm>
-        </div>
-
-        <div className='container mb-3'>
-
-            <div className='bg-light p-3' hidden={!loading}>
-                <span className="spinner-border spinner-border-sm me-3" aria-hidden="true"></span>
-                <span role="status">Searching...</span>
-            </div>
-
+        <div className='row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4'>
             {
-                (searchResult?.length > 0)
-                    ? <GridView items={searchResult}></GridView>
-                    : (loading ? '' : <p>Not found any spots.</p>)
+                searchResult.map(item => <div className='col mb-3' key={item.xid}><GridItem item={item} autoHeight={true} shadow={true}></GridItem></div>)
             }
 
-            <div hidden={loading || !searchResult?.length}>
-                <button className='btn d-block btn-outline-secondary w-75 mx-auto' type='button' onClick={() => handleLoadMore()}>Load More</button>
-            </div>
         </div>
-    </>
+
+        <div>
+            {
+                (!loading && !searchResult.length) ? <p>Nothing found</p> : ''
+            }
+
+            {
+                loading
+                    ? <div className='bg-light p-3'>
+                        <span className="spinner-border spinner-border-sm me-3" aria-hidden="true"></span>
+                        <span role="status">Searching...</span>
+                    </div>
+                    : (
+                        hasMore
+                            ? <button className='btn d-block btn-outline-secondary w-75 mx-auto' type='button' onClick={() => handleLoadMore()}>Load More</button>
+                            : ''
+                    )
+            }
+        </div>
+    </div>
+
 };

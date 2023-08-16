@@ -8,8 +8,8 @@ import "./index.css";
 const Logout = () => {
 
     useEffect(function () {
-        AuthStore.syncLogout();
-    }, []);
+        AuthStore.logout();
+    });
 
     return (
         <div className="container bg-light p-5 mt-3">

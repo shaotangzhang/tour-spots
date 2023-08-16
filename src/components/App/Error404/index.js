@@ -1,9 +1,7 @@
-import { Container } from "react-bootstrap";
+export default function Error404({ children }) {
 
-
-export default function Error404() {
-
-    return <Container>
-        <p>Page is not found.</p>
-    </Container>
+    return <div className="container text-center p-5">
+        <p className="display-1">404</p>
+        <h1 className="text-muted">{children || 'Page is not found.'}</h1>
+    </div>
 }

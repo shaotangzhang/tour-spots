@@ -1,66 +1,64 @@
-import GridView from "./GridView";
 import { useEffect, useState } from "react";
 import "./index.css";
 
-import OpenTripMap from "../../services/OpenTripMap";
-import Storage from "../../services/storage";
+import { searchNearby, searchRandom } from "../../services/Places";
+import GridView from "../Place/GridView";
 
-const cachedItems = Storage.getObject('home.cache') || {};
+let __CACHE__ = JSON.parse(localStorage.getItem('HOME_ITEMS')) || {};
+if (typeof __CACHE__ !== 'object') __CACHE__ = {};
+const storeSpots = (key, items) => {
+    __CACHE__[key] = items;
+    localStorage.setItem('HOME_ITEMS::' + key, JSON.stringify(items));
+}
 
 const Home = () => {
 
-    const [nearBySpots, setNearBySpots] = useState(cachedItems['near']);
-    const [cityWideSpots, setCityWideSpots] = useState(cachedItems['city']);
-    const [nationWideSpots, setNationWideSpots] = useState(cachedItems['nation']);
-    const [worldWideSpots, setWorldWideSpots] = useState(cachedItems['world']);
+    const [nearBySpots, setNearBySpots] = useState(__CACHE__['near']);
+    const [cityWideSpots, setCityWideSpots] = useState(__CACHE__['city']);
+    const [nationWideSpots, setNationWideSpots] = useState(__CACHE__['nation']);
+    const [worldWideSpots, setWorldWideSpots] = useState(__CACHE__['world']);
 
     useEffect(function () {
-        if (!(cachedItems['near']?.length)) {
-            OpenTripMap.searchNearby(25000, 8)
+        if (!(__CACHE__['near']?.length)) {
+            searchNearby(25000, 6)
                 .then(result => {
                     setNearBySpots(result.items);
-                    cachedItems['near'] = result.items;
-                    Storage.setObject('home.cache', cachedItems);
+                    storeSpots('near', result.items);
                 });
         }
 
-        if (!(cachedItems['city']?.length)) {
-            OpenTripMap.searchNearby(100000, 8)
+        if (!(__CACHE__['city']?.length)) {
+            searchNearby(100000, 6)
                 .then(result => {
                     setCityWideSpots(result.items);
-                    cachedItems['city'] = result.items;
-                    Storage.setObject('home.cache', cachedItems);
+                    storeSpots('city', result.items);
                 });
         }
 
-        if (!(cachedItems['nation']?.length)) {
-            OpenTripMap.searchNearby(250000, 8)
+        if (!(__CACHE__['nation']?.length)) {
+            searchNearby(250000, 8)
                 .then(result => {
                     setNationWideSpots(result.items);
-                    cachedItems['nation'] = result.items;
-                    Storage.setObject('home.cache', cachedItems);
+                    storeSpots('nation', result.items);
                 });
         }
 
-        if (!(cachedItems['world']?.length)) {
+        if (!(__CACHE__['world']?.length)) {
             Promise.all([
-                { lat: 40.6976307, lon: -74.1448306, radius: 25000, limit: 10, page: 1 },
-                { lat: 51.5287393, lon: -0.2667463, radius: 25000, limit: 10, page: 1 },
-                { lat: 48.8589383, lon: 2.2644634, radius: 25000, limit: 10, page: 1 },
-                { lat: -36.8594219, lon: 174.5409721, radius: 25000, limit: 10, page: 1 },
-            ].map(location => OpenTripMap.searchRandom(location)))
+                { lat: 40.6976307, lon: -74.1448306 },
+                { lat: 51.5287393, lon: -0.2667463 },
+                { lat: 48.8589383, lon: 2.2644634 },
+                { lat: -36.8594219, lon: 174.5409721 },
+            ].map(location => searchRandom(location, { radius: 25000, limit: 10, page: 1 })))
                 .then(items => {
                     setWorldWideSpots(items);
-                    cachedItems['world'] = items;
-                    Storage.setObject('home.cache', cachedItems);
+                    storeSpots('world', items);
                 });
         }
     }, []);
 
-    return <>
-        {/* <div className='container rounded-3 bg-light mb-5'>
-            <SearchForm onSearch={() => true}></SearchForm>
-        </div> */}
+    return <div className="container">
+
         <p data-testid="Home page">&nbsp;</p>
 
         <section className="container mb-5">
@@ -102,7 +100,7 @@ const Home = () => {
             }
 
         </section>
-    </>
+    </div>
 };
 
 export default Home;

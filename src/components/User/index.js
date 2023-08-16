@@ -1,50 +1,46 @@
-// import { useLocation } from "react-router";
-import "./index.css";
-import Auth from "../../services/Auth";
-import AuthStore from "../../stores/AuthStore";
-import Login from "../Login";
-import { Container } from "react-bootstrap";
-import { Routes, Route } from "react-router-dom";
-import { observer } from "mobx-react";
-import OpenTripMap from "../../services/OpenTripMap";
 import { useState } from "react";
+import { observer } from "mobx-react";
+import { Routes, Route } from "react-router-dom";
+import "./index.css";
+import Login from "../Login";
+import AuthStore from "../../stores/AuthStore";
+import Error404 from "../App/Error404";
+import { getFavourists } from "../../services/Favourists";
 
-const User = () => {
+const User = observer(() => {
 
-    if (Auth.isUserLogin()) {
+    const [isLoggedIn, setIsLoggedIn] = useState(!!AuthStore?.userInfo?.username);
 
-        return <Container>
+    const handleSuccess = (res) => {
+        setIsLoggedIn(true);
+    }
+
+    if (isLoggedIn) {
+
+        return <div className="container">
             <h3 className="mt-3" data-testid="User page">My account</h3>
             <Routes>
-                <Route path="/" element={<UserProfile />} />
-                <Route path="profile" element={<UserProfile />} />
-                <Route path="favourists" element={<UserFavourList />} />
-                <Route path="*" element={<UserPageNotFound />} />
+                <Route path="/" element={<UserProfile userInfo={AuthStore.userInfo} />} />
+                <Route path="/profile" element={<UserProfile userInfo={AuthStore.userInfo} />} />
+                <Route path="*" element={<Error404 />} />
             </Routes>
-        </Container>
+        </div>
     }
 
     return <Login></Login>
-};
+});
 
-const UserPageNotFound = () => {
-    return <p>Page is not found.</p>
-}
+const UserProfile = ({ userInfo }) => {
 
-const UserProfile = () => {
-
-    const { email, username, fullName } = AuthStore.userInfo;
-
-    const [list, setList] = useState(OpenTripMap.getFavors() || []);
+    const favourists = getFavourists(userInfo?.username);
+    const { email, username, fullName } = userInfo || {};
+    const [list, setList] = useState(favourists.getList());
 
     const handleRemove = (xid) => {
         if (window.confirm('Do you really want to remove this spot?')) {
-            OpenTripMap.removeFavor(xid);
+            favourists.remove(xid);
 
-            const pos = list?.findIndex(item => item.xid === xid);
-            if (pos >= 0) {
-                setList([...list.slice(0, pos), ...list.slice(pos + 1)]);
-            }
+            setList(favourists.getList());
         }
     }
 
@@ -60,7 +56,7 @@ const UserProfile = () => {
             <div className="list-group">
                 {
                     (list || []).map(item => <div className="list-group-item d-flex justify-content-between align-items-center" key={item.xid}>
-                        <img src={item.preview?.source} className="img-thumbnail me-3" alt={item.name} style={{width: 100}}/>
+                        <img src={item.preview?.source} className="img-thumbnail me-3" alt={item.name} style={{ width: 100 }} />
                         <div className="flex-grow-1">
                             <h6><a href={`/search/${item.xid}`} target={item.xid}>{item.name}, {item.address?.country}</a></h6>
                             <div>{item.point?.lon}, {item.point?.lat}</div>
@@ -73,9 +69,4 @@ const UserProfile = () => {
     </>
 }
 
-const UserFavourList = () => {
-
-    return <ul><li>favourist item</li></ul>
-}
-
-export default observer(User);
+export default User;

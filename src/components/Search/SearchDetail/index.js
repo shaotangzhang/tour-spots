@@ -1,16 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
-import "./index.css";
+import { getPlace } from "../../../services/Places"
+import { searchGallery } from "../../../services/Gallery";
+import FavourButton from "./FavourButton";
+import Error404 from "../../App/Error404";
 
-import OpenTripMap from "../../../services/OpenTripMap";
-import Flickr from "../../../services/Flickr";
+function formatTitle(place) {
+    let title = place?.wikipedia_extracts?.title;
+    if (title) {
+        title = title.replace(/^[a-z]+:/, '').trim();
+    }
+    return title || place?.name || place?.title;
+}
 
-export default function SearchDetail({ xid }) {
+export default function SearchDetail({ xid, onLoad, onError }) {
+
     const params = useParams();
     const dialog = useRef();
 
-    const [item, setItem] = useState();
-    const [inFavor, setInFavor] = useState(null);
+    const [place, setPlace] = useState();
 
     const [gallery, setGallery] = useState();
     const [galleryPage, setGalleryPage] = useState(1);
@@ -24,42 +32,43 @@ export default function SearchDetail({ xid }) {
     if (!xid) xid = params.xid;
 
     useEffect(function () {
-        if (xid) {
-            OpenTripMap.xid(xid)
-                .then(item => {
-                    setItem(item);
-                    setGalleryRange(1000);
-                    setInFavor(OpenTripMap.inFavor(xid));
-
-                    if (item.name && item.address?.country) {
-                        setGalleryLoading(true);
-                        Flickr.search(`${item.name}, ${item.address.country}`, 24, 1, item?.point, galleryRange)
-                            .then(res => {
-                                setGallery(res.items);
-                                setGalleryTotal(res.total);
-                            })
-                            .finally(() => setGalleryLoading(false));
-                    }
-                    return item;
-                });
+        if (typeof xid === 'string') {
+            getPlace(xid).then(res => {
+                setPlace(res);
+                return res;
+            }).then(onLoad).catch(onError);
+        } else if (typeof onError === 'function') {
+            Promise.reject().catch(onError);
         }
-    }, [xid]);
+    }, [xid, onLoad, onError]);
 
+    useEffect(function () {
+        setGalleryPage(0);
+        handleGalleryLoadMore();
+    }, [place]);
+
+    let galleryTimer;
     const handleGalleryLoadMore = () => {
-        if (item && item.name && item.address?.country && (!gallery || (gallery.length < galleryTotal))) {
-            const nextPage = galleryPage + 1;
+        if (place && place.name && place.address?.country && (!gallery || (gallery.length < galleryTotal))) {
 
-            setGalleryLoading(true);
-            setGalleryRange(galleryRange + 1000);
-            Flickr.search(`${item.name}, ${item.address.country}`, 24, nextPage, item?.point, galleryRange)
-                .then(res => {
-                    const list = gallery || [];
-                    res.items.forEach(img => list.find(m => m.id === img.id) || list.push(img));
-                    setGallery(list);
-                    setGalleryTotal(res.total);
-                    return res;
-                })
-                .finally(() => { setGalleryPage(nextPage); setGalleryLoading(false); });
+            if (galleryTimer) clearTimeout(galleryTimer);
+            galleryTimer = setTimeout(() => {
+                const nextPage = galleryPage + 1;
+
+                setGalleryLoading(true);
+                setGalleryRange(galleryRange + 1000);
+
+                searchGallery(`${place.name}, ${place.address.country}`, 24, nextPage, place?.point, galleryRange)
+                    .then(res => {
+                        const list = gallery || [];
+                        res.items.forEach(img => list.find(m => m.id === img.id) || list.push(img));
+                        setGallery(list);
+                        setGalleryTotal(res.total);
+                        return res;
+                    })
+                    .finally(() => { setGalleryPage(nextPage); setGalleryLoading(false); });
+
+            }, 500);
         }
     };
 
@@ -74,41 +83,25 @@ export default function SearchDetail({ xid }) {
         dialog?.current.close();
     }
 
-    const handleAddToFavor = (toggle) => {
-        if (item) {
-            if (toggle) {
-                OpenTripMap.addToFavor(item);
-            } else {
-                OpenTripMap.removeFavor(item);
-            }
-
-            setInFavor(toggle);
-        }
-    }
-
-    return <>
-        <div className="bg-light p-4 mb-3" data-testid="Search detail">
+    return place?.xid ? <>
+        <div className="bg-light p-4 mb-3" data-testid={place?.xid}>
             <div className="container">
-                <div className="float-end" hidden={inFavor===null}>
-                {
-                    inFavor
-                        ? <button className="btn btn-outline-danger" onClick={() => handleAddToFavor(false)}>Remove favor</button>
-                        : <button className="btn btn-outline-secondary" onClick={() => handleAddToFavor(true)}>Add to favor</button>
-                }
+                <div className="float-end">
+                    <FavourButton item={place}></FavourButton>
                 </div>
 
                 <div className="d-flex justify-content-start align-items-center">
                     {
-                        item?.preview?.source ? <img src={item?.preview?.source} className="img-thumbnail me-5" style={{ height: 200 }} /> : ''
-                    }                    
+                        place?.preview?.source ? <img src={place?.preview?.source} alt={formatTitle(place)} className="img-thumbnail me-5" style={{ height: 200, maxWidth: 400 }} /> : ''
+                    }
                     <div className="flex-grow-1">
-                        <h3>{(item?.wikipedia_extracts?.title || '').replace(/[a-z]+\:/, '') || item?.name}</h3>
+                        <h3>{formatTitle(place)}</h3>
                         <address>
-                            {item?.address?.suburb} {item?.address?.state} {item?.address?.postcode} <br />
-                            {item?.address?.country}
+                            {place?.address?.suburb} {place?.address?.state} {place?.address?.postcode} <br />
+                            {place?.address?.country}
                         </address>
-                        <p>Rate: {item?.rate}</p>
-                        <p>{item?.point?.lon}, {item?.point?.lat}</p>
+                        <p>Rate: {place?.rate}</p>
+                        <p>{place?.point?.lon}, {place?.point?.lat}</p>
                     </div>
                 </div>
             </div>
@@ -119,14 +112,16 @@ export default function SearchDetail({ xid }) {
             <section className="mb-3 pb-3 border-bottom">
                 <h4 className="mb-3">Information</h4>
 
-                {(item?.info || item?.wikipedia_extracts?.text || '').replace(/[\r\n]+/, '<br />')}
+                {(place?.info || place?.wikipedia_extracts?.text || '').replace(/[\r\n]+/, '<br />')}
             </section>
 
             <section className="mb-3 pb-3 border-bottom">
                 <h4 className="mb-3">Categories</h4>
                 <p>{
 
-                    (item?.kinds || '').split(',').filter(kind => kind.trim()).map(kind => <span key={kind} className="btn btn-sm btn-outline-secondary text-dark m-1">{kind.replace(/_/g, ' ')}</span>)
+                    (place?.kinds || '').split(',')
+                        .filter(kind => kind.trim())
+                        .map(kind => <span key={kind} className="btn btn-sm btn-outline-secondary text-dark m-1">{kind.replace(/_/g, ' ')}</span>)
 
                 }</p>
             </section>
@@ -135,9 +130,9 @@ export default function SearchDetail({ xid }) {
                 <h4 className="mb-3">Gallery</h4>
                 <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
                     {
-                        (gallery || []).map(item => <div key={item.id} className="col card border-0 h-100 mb-3" itemScope>
+                        (gallery || []).filter(item=>item.preview || item.url).map(item => <div key={item.id} className="col card border-0 h-100 mb-3" itemScope>
                             <div className="card-img-top text-decoration-none w-100 ratio ratio-1x1" tabIndex={0} style={{
-                                backgroundImage: `url(${item.preview || item.url || 'https://placehold.co/600x400'})`,
+                                backgroundImage: `url(${item.preview || item.url})`,
                                 backgroundRepeat: false,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center'
@@ -153,7 +148,7 @@ export default function SearchDetail({ xid }) {
                     <span role="status">Searching...</span>
                 </div>
 
-                <div className='p-3' hidden={galleryLoading || (gallery && (gallery.length >= galleryTotal))}>
+                <div className='p-3' hidden={galleryLoading || (gallery && (gallery.length >= galleryTotal)) || (galleryRange>25000)}>
                     <button className="btn btn-light text-dark d-block w-75 mx-auto" type="button" onClick={handleGalleryLoadMore}>Explore more (+ {galleryRange / 1000} km)</button>
                 </div>
 
@@ -164,7 +159,7 @@ export default function SearchDetail({ xid }) {
             style={{ position: 'fixed', zIndex: 1000 }}
             ref={dialog}>
             <button className="btn btn-close btn-close-white position-absolute m-3 end-0 top-0" type="button" onClick={() => handleDialogClose()}></button>
-            <img src={dialogImage} className="img-fluid" style={{ maxWidth: '90vw', maxHeight: '90vh' }} />
+            <img src={dialogImage} alt="preview" className="img-fluid" style={{ maxWidth: '90vw', maxHeight: '90vh' }} />
         </dialog>
-    </>
-};
+    </> : <Error404>Spot is not found.</Error404>;
+}

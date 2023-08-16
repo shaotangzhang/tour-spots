@@ -1,27 +1,36 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import "./index.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-import Footer from "./Footer";
-import Header from "./Header";
-import Home from "../Home";
-import Login from "../Login";
-import Logout from "../Login/Logout";
-import Register from "../Login/Register";
+import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import { useEffect } from 'react';
+import { getApiProxyToken } from '../../services';
+import Header from './Header';
+import Footer from './Footer';
 import Error404 from "./Error404";
-import About from "../About";
-import Search from "../Search";
-import SearchDetail from "../Search/SearchDetail";
-import User from "../User";
+import Search from '../Search';
+import SearchDetail from '../Search/SearchDetail';
+import User from '../User';
+import Home from '../Home';
+import Login from '../Login';
+import Logout from '../Login/Logout';
+import Register from '../Login/Register';
 
-const App = () => {
+
+export default function App() {
+
+    useEffect(function () {
+        getApiProxyToken();
+
+        return function () {
+            // unloaded
+        };
+    }, [])
+
     return <BrowserRouter>
-        <Header></Header>
-        <main className="layout-body" data-testid="App main">
+        <header className="layout-header">
+            <Header></Header>
+        </header>
+
+        <main style={{ minHeight: '70vh' }}>
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/about/:name" element={<About />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/search/:xid" element={<SearchDetail />} />
                 <Route path="/login" element={<Login />} />
@@ -31,8 +40,9 @@ const App = () => {
                 <Route path="*" element={<Error404></Error404>} />
             </Routes>
         </main>
-        <Footer></Footer>
+
+        <footer className="layout-footer">
+            <Footer></Footer>
+        </footer>
     </BrowserRouter>
 };
-
-export default App;

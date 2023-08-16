@@ -1,20 +1,6 @@
 import { createProxyFetch, httpBuildQuery, HTTP_JSON_HEADERS } from ".";
-import Storage from "./storage";
 
 const proxy = createProxyFetch('auth', HTTP_JSON_HEADERS);
-const auth = Storage.getObject('auth', {});
-
-const useLabelCallbacks = [];
-
-export function useLabel(callback) {
-    if(!useLabelCallbacks.includes(callback)) {
-        useLabelCallbacks.push(callback);
-    }
-}
-
-export function setLabel(label) {
-    useLabelCallbacks.forEach(f=>f(label));
-}
 
 const Auth = {
 
@@ -34,14 +20,6 @@ const Auth = {
         return password;
     },
 
-    getUserInfo() {
-        return auth?.userInfo;
-    },
-
-    isUserLogin() {
-        return !!auth?.userInfo?.username;
-    },
-
     async register(email, password, fullName) {
         email = this.validateEmail(email);
         password = this.validatePassword(password);
@@ -50,12 +28,11 @@ const Auth = {
             .then(res => {
 
                 // checks if the response includes the user information
+                if (res?.username) {
+                    return res;
+                }
+
                 if (res?.userInfo?.username) {
-
-                    // stores the auth information to the local storage
-                    Storage.setObject('auth', auth);
-                    auth.userInfo = { ...res.userInfo };
-
                     // returns the user information
                     return res.userInfo;
                 }
@@ -78,12 +55,11 @@ const Auth = {
             .then(res => {
 
                 // checks if the response includes the user information
+                if (res?.username) {
+                    return res;
+                }
+
                 if (res?.userInfo?.username) {
-
-                    // stores the auth information to the local storage
-                    Storage.setObject('auth', res);
-                    auth.userInfo = { ...res.userInfo };
-
                     // returns the user information
                     return res.userInfo;
                 }
@@ -98,11 +74,8 @@ const Auth = {
             });
     },
 
-    logout() {
-        if (auth?.userInfo) {
-            delete auth.userInfo;
-            Storage.removeObject('auth');
-        }
+    async logout() {
+        
     }
 };
 

@@ -5,8 +5,9 @@ import AuthStore from "../../stores/AuthStore";
 import User from "../User";
 
 import "./index.css";
+import { observer } from 'mobx-react';
 
-export default function Login({ redirectUrl, ...rest }) {
+const Login = observer(({ redirectUrl, onSuccess, ...rest }) => {
 
     const navigate = useNavigate();
 
@@ -20,9 +21,13 @@ export default function Login({ redirectUrl, ...rest }) {
 
         const { email, password } = e.target;
 
-        AuthStore.syncLogin(email.value, password.value)
-            .then(() => {
+        AuthStore.doLogin(email.value, password.value)
+            .then((res) => {
                 setSuccess(true);
+                if(typeof onSuccess==="function") {
+                    return onSuccess(res);
+                }
+
                 navigate(redirectUrl || '/user');
             })
             .catch(ex => {
@@ -30,6 +35,8 @@ export default function Login({ redirectUrl, ...rest }) {
                 handleLoginResult(loginResult);
                 handleCloseAlert(false);
             });
+
+        return false;
     };
 
     return success
@@ -72,4 +79,6 @@ export default function Login({ redirectUrl, ...rest }) {
                 </div>
             </div>
         </div>
-}
+});
+
+export default Login;

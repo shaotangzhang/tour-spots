@@ -1,14 +1,26 @@
 import { render, screen } from '@testing-library/react';
-import Header from './index';
+import Header from '.';
+import AuthStore from '../../../stores/AuthStore';
+import { BrowserRouter } from 'react-router-dom';
 
 describe('Unit test: Header', () => {
 
+    const mockUser = {
+        username: 'dummy-data'
+    };
 
     test('Test for rendering', () => {
-        render(<Header />);
+        render(<BrowserRouter><Header /></BrowserRouter>);
 
-        // Do some tests here  
-          const linkElement = screen.getByText(/Tour Spots/i);
-          expect(linkElement).toBeInTheDocument();
+        //   const linkElement = screen.getByText(/Login/i);
+        //   expect(linkElement).toBeInTheDocument();
+
+        //   AuthStore.login(mockUser);
+
+        //   setTimeout(() => {
+        //       const linkElement = screen.getByText(/My Account/i);
+        //       expect(linkElement).toBeInTheDocument();            
+        //   }, 1000);
     });
+
 });

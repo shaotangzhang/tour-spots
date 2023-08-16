@@ -13,9 +13,15 @@ const Register = ({ redirect }) => {
         e.preventDefault();
         e.stopPropagation();
 
-        const { email, password, fullName } = e.target.elements;
+        const { email, password, fullName, confirm_password } = e.target.elements;
+        
+        if(confirm_password.value!==password.value) {
+            alert('Please enter the same password to confirm.');
+            confirm_password.focus();
+            return false;
+        }
 
-        AuthStore.syncRegister(email.value, password.value, fullName.value)
+        AuthStore.doRegister(email.value, password.value, fullName.value)
             .then(() => {
                 setRegisterResult('Successfully registered.');
 
@@ -70,6 +76,16 @@ const Register = ({ redirect }) => {
                                 name="password"
                                 className="form-control"
                                 id="password"
+                                required
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <label htmlFor="confirm_password" className="form-label">Confirm password</label>
+                            <input
+                                type="password"
+                                name="confirm_password"
+                                className="form-control"
+                                id="confirm_password"
                                 required
                             />
                         </div>
