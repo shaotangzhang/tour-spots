@@ -12,11 +12,8 @@ const Header = observer(({ onSearch }) => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
 
-    const isUserLoggedIn = computed(()=>!!AuthStore?.userInfo?.username);
-
     const [search, setSearch] = useState(queryParams.get('search') || '');
     const [country, setCountry] = useState(queryParams.get('country') || 'au');
-    const [isLoggedIn, setIsLoggedIn] = useState(!!AuthStore?.userInfo?.username);
 
     const handleSearch = e => {
 
