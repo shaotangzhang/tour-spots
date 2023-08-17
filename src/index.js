@@ -8,21 +8,10 @@ import App from './components/App';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-if (process.env.NODE_ENV === 'production') {
-  // disable the console log feature under the production mode.
-  console.log = function () { };
+// console.log = function () { };
 
-  root.render(
-    <App />
-  );
-
-} else {
-
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
-}
+root.render(
+  <App />
+);
 
 // reportWebVitals(console.log);

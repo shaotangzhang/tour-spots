@@ -13,8 +13,8 @@ const User = observer(() => {
 
     if (isLoggedIn) {
 
-        return <div className="container">
-            <h3 className="mt-3" data-testid="User page">My account</h3>
+        return <div className="container py-4">
+            <h3 className="mb-3" data-testid="User page">My account</h3>
             <Routes>
                 <Route path="/" element={<UserProfile userInfo={AuthStore.userInfo} />} />
                 <Route path="/profile" element={<UserProfile userInfo={AuthStore.userInfo} />} />
@@ -41,21 +41,21 @@ const UserProfile = ({ userInfo }) => {
     }
 
     return <>
-        <div className="bg-light p-3 mb-3">
-            <p><label>Username:</label> {username}</p>
-            <p><label>Full name:</label> {fullName}</p>
-            <p><label>Email:</label> {email}</p>
-        </div>
+        <section className="bg-light rounded border p-3 mb-4" aria-label="User info">
+            <div className="mb-3"><label>Username:</label> <span className="form-control">{username}</span></div>
+            <div className="mb-3"><label>Full name:</label> <span className="form-control">{fullName}</span></div>
+            <div className="mb-3"><label>Email:</label> <span className="form-control">{email}</span></div>
+        </section>
 
-        <section className="mb-3">
+        <section className="mb-3" aria-label="User favourist list" hidden={!list?.length}>
             <h5>Favourists</h5>
-            <div className="list-group">
+            <div className="list-group" role="group">
                 {
                     (list || []).map(item => <div className="list-group-item d-flex justify-content-between align-items-center" key={item.xid}>
-                        <img src={item.preview?.source} className="img-thumbnail me-3" alt={item.name} style={{ width: 100 }} />
+                        <img className="img-thumbnail me-3" src={item.preview?.source} alt={item.name} style={{ width: 100 }} />
                         <div className="flex-grow-1">
                             <h6><a href={`/search/${item.xid}`} target={item.xid}>{item.name}, {item.address?.country}</a></h6>
-                            <div>{item.point?.lon}, {item.point?.lat}</div>
+                            <div role="status">{item.point?.lon}, {item.point?.lat}</div>
                         </div>
                         <button className="btn btn-sm btn-outline-danger" onClick={() => handleRemove(item.xid)}>Remove</button>
                     </div>)

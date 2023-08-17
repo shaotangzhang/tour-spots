@@ -127,7 +127,7 @@ export default function SearchDetail({ xid, onLoad, onError }) {
     let description;
 
     return place?.xid ? <>
-        <div className="bg-light p-4 mb-3" data-testid={place?.xid}>
+        <div className="p-4 mb-3" data-testid={place?.xid}>
             <div className="container">
                 <div className="float-end">
                     <FavourButton item={place}></FavourButton>

@@ -30,8 +30,8 @@ export default function App() {
         <main className='bg-white layout-body' style={{ minHeight: '70vh'}} aria-label="Page body">
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/search" element={<Search />} />
                 <Route path="/search/:xid" element={<SearchDetail />} />
+                <Route path="/search" element={<Search />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/logout" element={<Logout />} />
                 <Route path="/register" element={<Register />} />
