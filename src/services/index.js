@@ -1,7 +1,7 @@
-// const API_PROXY_HOST = 'http://tour-spots.top';
-// const API_PROXY_USER = 'tour-spots.github'
-const API_PROXY_HOST = process.env.REACT_APP_API_PROXY_HOST;
-const API_PROXY_USER = process.env.REACT_APP_API_PROXY_USER;
+const API_PROXY_HOST = 'http://tour-spots.top';
+const API_PROXY_USER = 'tour-spots.github'
+// const API_PROXY_HOST = process.env.REACT_APP_API_PROXY_HOST;
+// const API_PROXY_USER = process.env.REACT_APP_API_PROXY_USER;
 const API_PROXY_PASS = process.env.REACT_APP_API_PROXY_PASS;
 
 const IP_INFO_STORAGE_KEY = 'current-ip-info';
