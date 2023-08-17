@@ -2,11 +2,13 @@
 
 Welcome to Tour Spots! This is a React JS project that provides information about various tourist destinations and attractions.
 
+Demo site:
+http://tour-spots.s3-website-ap-southeast-2.amazonaws.com/
+
 ## Features
 
 - Explore a list of popular tour spots.
-- Get detailed information about each tour spot, including photos and reviews.
-- Check the current weather at each destination.
+- Get detailed information about each tour spot withphotos around.
 - Save your favorite tour spots for easy access.
 
 ## Getting Started
@@ -26,6 +28,7 @@ Welcome to Tour Spots! This is a React JS project that provides information abou
 ## Contributing
 
 Contributions are welcome! If you'd like to contribute to this project, please follow these steps:
+
 1. Fork the repository.
 2. Create a new branch for your feature: `git checkout -b feature-name`
 3. Commit your changes: `git commit -m "Add new feature"`
@@ -38,6 +41,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-If you have any questions or feedback, feel free to contact us at shaotang.zhang@gmail.com.
+If you have any questions or feedback, feel free to contact us on github.
 
 Happy exploring!
