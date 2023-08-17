@@ -26,7 +26,11 @@ jobs:
               run: npm run test
 
             - name: Build app
-              run: REACT_APP_API_KEY=${{ secrets.REACT_APP_API_KEY }} npm run build
+              run: |
+                REACT_APP_API_PROXY_HOST=${{ secrets.REACT_APP_API_PROXY_HOST }} 
+                REACT_APP_API_PROXY_USER=${{ secrets.REACT_APP_API_PROXY_USER }} 
+                REACT_APP_API_PROXY_PASS=${{ secrets.REACT_APP_API_PROXY_PASS }} 
+                npm run build
 
             - name: Deploy assets to S3
               run: aws s3 sync ./build/ s3://${{ secrets.BUCKET }} --delete
