@@ -9,11 +9,7 @@ import { getFavourists } from "../../services/Favourists";
 
 const User = observer(() => {
 
-    const [isLoggedIn, setIsLoggedIn] = useState(!!AuthStore?.userInfo?.username);
-
-    const handleSuccess = (res) => {
-        setIsLoggedIn(true);
-    }
+    const [isLoggedIn] = useState(!!AuthStore?.userInfo?.username);
 
     if (isLoggedIn) {
 
