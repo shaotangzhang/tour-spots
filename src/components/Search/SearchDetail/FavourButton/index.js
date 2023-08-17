@@ -1,7 +1,7 @@
+import { useState } from "react";
+import { observer } from "mobx-react";
 import AuthStore from "../../../../stores/AuthStore";
 import { getFavourists } from "../../../../services/Favourists";
-import { observer } from "mobx-react";
-import { useState } from "react";
 
 const FavourButton = observer(({ item }) => {
 

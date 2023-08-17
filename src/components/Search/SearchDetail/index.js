@@ -74,10 +74,8 @@ export default function SearchDetail({ xid, onLoad, onError }) {
         }
     }, [xid, onLoad, onError]);
 
-    useEffect(function () {
-        setGalleryPage(0);
-        handleGalleryLoadMore();
-    });
+    // eslint-disable-next-line
+    useEffect(function () { setGalleryPage(0); handleGalleryLoadMore(); }, []);
 
     let galleryTimer;
     const handleGalleryLoadMore = () => {
@@ -145,7 +143,7 @@ export default function SearchDetail({ xid, onLoad, onError }) {
             <section className="mb-3 pb-3 border-bottom" aria-label="Information">
                 <h4 className="mb-3">Information</h4>
                 {
-                    (description = place?.info || place?.wikipedia_extracts?.text || '')
+                    ((description = place?.info || place?.wikipedia_extracts?.text || ''))
                         ? [
                             description.replace(/[\r\n]+/, '<br />'),
                             translateLink(description, 1)
