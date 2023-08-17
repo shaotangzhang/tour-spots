@@ -1,29 +1,26 @@
 import { render, screen } from '@testing-library/react';
-import MyComponent from './index';
+import Header from '.';
+import AuthStore from '../../../stores/AuthStore';
+import { BrowserRouter } from 'react-router-dom';
 
-describe('Unit test: ' + (MyComponent.constructor?.name || MyComponent.name), () => {
+describe('Unit test: Header', () => {
 
-    beforeAll(() => {
-        
-    });
-
-    beforeEach(() => {
-
-    });
-
-    afterEach(() => {
-
-    });
-
-    afterAll(() => {
-
-    });
+    const mockUser = {
+        username: 'dummy-data'
+    };
 
     test('Test for rendering', () => {
-        render(<MyComponent />);
+        render(<BrowserRouter><Header /></BrowserRouter>);
 
-        // Do some tests here  
-        //   const linkElement = screen.getByText(/learn react/i);
+        //   const linkElement = screen.getByText(/Login/i);
         //   expect(linkElement).toBeInTheDocument();
+
+        //   AuthStore.login(mockUser);
+
+        //   setTimeout(() => {
+        //       const linkElement = screen.getByText(/My Account/i);
+        //       expect(linkElement).toBeInTheDocument();            
+        //   }, 1000);
     });
+
 });

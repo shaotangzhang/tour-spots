@@ -1,14 +1,14 @@
 import { render, screen } from '@testing-library/react';
-import Register from './index';
+import Search from './index';
 import { BrowserRouter } from 'react-router-dom';
 
-describe('Unit test: Register', () => {
+describe('Unit test: Search', () => {
 
     test('Test for rendering', () => {
-        render(<BrowserRouter><Register /></BrowserRouter>);
+        render(<BrowserRouter><Search /></BrowserRouter>);
 
         // Do some tests here  
-          const testElement = screen.getByText(/User Registration/i);
+          const testElement = screen.getByTestId('Search page');
           expect(testElement).toBeInTheDocument();
     });
 });

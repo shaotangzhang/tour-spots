@@ -1,29 +1,13 @@
 import { render, screen } from '@testing-library/react';
-import MyComponent from './index';
+import Footer from '.';
 
-describe('Unit test: ' + (MyComponent.constructor?.name || MyComponent.name), () => {
-
-    beforeAll(() => {
-        
-    });
-
-    beforeEach(() => {
-
-    });
-
-    afterEach(() => {
-
-    });
-
-    afterAll(() => {
-
-    });
+describe('Unit test: Footer', () => {
 
     test('Test for rendering', () => {
-        render(<MyComponent />);
+        render(<Footer />);
 
         // Do some tests here  
-        //   const linkElement = screen.getByText(/learn react/i);
-        //   expect(linkElement).toBeInTheDocument();
+          const linkElement = screen.getByText(/Copyright reserved/i);
+          expect(linkElement).toBeInTheDocument();
     });
 });
