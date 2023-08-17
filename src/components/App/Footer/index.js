@@ -1,5 +1,6 @@
 import "./index.css";
 
+
 export default function Footer() {
 
     return <div className="container text-center pb-4">

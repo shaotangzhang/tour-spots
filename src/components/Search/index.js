@@ -65,12 +65,10 @@ export default function Search() {
         }
     }
 
-    useEffect(function () {
-        setCurrentPage(1);
-        handleLoadMore();
-    });
+    // eslint-disable-next-line
+    useEffect(function () { setCurrentPage(1); handleLoadMore(); }, [search, country, kinds]);
 
-    return <div className='container py-4' data-testid="Search page">
+    return <div className='container p-4' data-testid="Search page">
 
         <h3 className='mb-4'>Search result of "{search}, {country}"</h3>
 

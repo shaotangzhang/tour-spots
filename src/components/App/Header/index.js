@@ -5,7 +5,6 @@ import "./index.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import { useLocation } from 'react-router';
-import { computed } from 'mobx';
 
 const Header = observer(({ onSearch }) => {
 
