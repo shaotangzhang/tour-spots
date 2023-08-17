@@ -75,7 +75,7 @@ export default function SearchDetail({ xid, onLoad, onError }) {
     }, [xid, onLoad, onError]);
 
     // eslint-disable-next-line
-    useEffect(function () { setGalleryPage(0); handleGalleryLoadMore(); });
+    useEffect(function () { setGalleryPage(0); handleGalleryLoadMore(); },[xid]);
 
     let galleryTimer;
     const handleGalleryLoadMore = () => {
