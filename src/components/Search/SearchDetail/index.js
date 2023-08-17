@@ -13,15 +13,6 @@ function formatTitle(place) {
     return title || place?.name || place?.title;
 }
 
-function isEnglishText(text) {
-    const englishCharCount = [...text].reduce((count, char) => {
-      const charCode = char.charCodeAt(0);
-      return count + (charCode >= 0 && charCode <= 127 ? 1 : 0);
-    }, 0);
-  
-    return englishCharCount / text.length > 0.5;
-  }
-
 function analyzeText(text) {
     const words = text.toLowerCase().split(/\s+/);
 
@@ -47,7 +38,7 @@ function analyzeText(text) {
 function translateLink(text, key) {
     if (!analyzeText(text)) {
         return <div className="my-3" key={key}>
-            <a href={`https://translate.google.com/?sl=auto&tl=en&op=translate&text=${encodeURIComponent(text)}`} target="_blank">
+            <a href={`https://translate.google.com/?sl=auto&tl=en&op=translate&text=${encodeURIComponent(text)}`} target="_blank" rel="noreferrer">
                 <small>Translate this text</small>
             </a>
         </div>;
@@ -86,7 +77,7 @@ export default function SearchDetail({ xid, onLoad, onError }) {
     useEffect(function () {
         setGalleryPage(0);
         handleGalleryLoadMore();
-    }, [place]);
+    });
 
     let galleryTimer;
     const handleGalleryLoadMore = () => {

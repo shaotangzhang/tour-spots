@@ -68,7 +68,7 @@ export default function Search() {
     useEffect(function () {
         setCurrentPage(1);
         handleLoadMore();
-    }, [search, country, kinds]);
+    });
 
     return <div className='container py-4' data-testid="Search page">
 

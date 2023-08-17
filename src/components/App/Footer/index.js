@@ -1,5 +1,3 @@
-import { Container } from "react-bootstrap";
-
 import "./index.css";
 
 export default function Footer() {
