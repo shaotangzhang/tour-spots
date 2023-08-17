@@ -12,7 +12,6 @@ import Login from '../Login';
 import Logout from '../Login/Logout';
 import Register from '../Login/Register';
 
-
 export default function App() {
 
     useEffect(function () {
@@ -24,11 +23,11 @@ export default function App() {
     }, [])
 
     return <BrowserRouter>
-        <header className="layout-header">
+        <header className="layout-header" aria-label="Page header">
             <Header></Header>
         </header>
 
-        <main style={{ minHeight: '70vh' }}>
+        <main className='bg-white layout-body' style={{ minHeight: '70vh'}} aria-label="Page body">
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/search" element={<Search />} />
@@ -41,7 +40,7 @@ export default function App() {
             </Routes>
         </main>
 
-        <footer className="layout-footer">
+        <footer className="layout-footer pt-4 border-top" aria-label="Page footer">
             <Footer></Footer>
         </footer>
     </BrowserRouter>

@@ -57,48 +57,54 @@ const Home = () => {
         }
     }, []);
 
-    return <div className="container">
+    return <div className="container py-5" data-testid="Home page">
 
-        <p data-testid="Home page">&nbsp;</p>
-
-        <section className="container mb-5">
-            <h5 className="mb-3">Nearby spots</h5>
+        <section className="container mb-5" aria-label="Nearby spots">
+            <h6 className="mb-3">Nearby spots</h6>
             {
                 nearBySpots
                     ? <GridView items={nearBySpots} maxCount={4}></GridView>
-                    : <p className="bg-light p-1 px-3">Loading ...</p>
+                    : <div className="bg-light py-2 px-3" aria-label="loading">
+                        <span className="spinner-border spinner-border-sm me-3" aria-hidden="true"></span>
+                        <span role="status">Loading...</span>
+                    </div>
             }
-
         </section>
 
-        <section className="container mb-5">
-            <h5 className="mb-3">Hot spots of the city</h5>
+        <section className="container mb-5" aria-label="Hot spots of the city">
+            <h6 className="mb-3">Hot spots of the city</h6>
             {
                 cityWideSpots
                     ? <GridView items={cityWideSpots} maxCount={4}></GridView>
-                    : <p className="bg-light p-1 px-3">Loading ...</p>
+                    : <div className="bg-light py-2 px-3" aria-label="loading">
+                        <span className="spinner-border spinner-border-sm me-3" aria-hidden="true"></span>
+                        <span role="status">Loading...</span>
+                    </div>
             }
-
         </section>
 
-        <section className="container mb-5">
-            <h5 className="mb-3">Hot spots of the country</h5>
+        <section className="container mb-5" aria-label="Hot spots of the country">
+            <h6 className="mb-3">Hot spots of the country</h6>
             {
                 nationWideSpots
                     ? <GridView items={nationWideSpots} maxCount={4}></GridView>
-                    : <p className="bg-light p-1 px-3">Loading ...</p>
+                    : <div className="bg-light py-2 px-3" aria-label="loading">
+                        <span className="spinner-border spinner-border-sm me-3" aria-hidden="true"></span>
+                        <span role="status">Loading...</span>
+                    </div>
             }
-
         </section>
 
-        <section className="container mb-5">
-            <h5 className="mb-3">Hot spots of the world</h5>
+        <section className="container mb-5" aria-label="Hot spots of the world">
+            <h6 className="mb-3">Hot spots of the world</h6>
             {
                 worldWideSpots
                     ? <GridView items={worldWideSpots} maxCount={4}></GridView>
-                    : <p className="bg-light p-1 px-3">Loading ...</p>
+                    : <div className="bg-light py-2 px-3" aria-label="loading">
+                        <span className="spinner-border spinner-border-sm me-3" aria-hidden="true"></span>
+                        <span role="status">Loading...</span>
+                    </div>
             }
-
         </section>
     </div>
 };

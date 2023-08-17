@@ -70,7 +70,7 @@ export default function Search() {
         handleLoadMore();
     }, [search, country, kinds]);
 
-    return <div className='container mt-4' data-testid="Search page">
+    return <div className='container py-4' data-testid="Search page">
 
         <h3 className='mb-4'>Search result of "{search}, {country}"</h3>
 
@@ -83,7 +83,7 @@ export default function Search() {
 
         <div>
             {
-                (!loading && !searchResult.length) ? <p>Nothing found</p> : ''
+                (!loading && !searchResult.length) ? <p role='status'>Nothing found</p> : ''
             }
 
             {

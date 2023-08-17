@@ -129,7 +129,7 @@ const Header = observer(({ onSearch }) => {
                         AuthStore.userInfo?.username
                             ? <>
                                 <NavDropdown title="My Account" id="user-nav-dropdown">
-                                    <NavDropdown.Item href="/user/profile">User profile</NavDropdown.Item>
+                                    <NavDropdown.Item href="/user">User profile</NavDropdown.Item>
                                     <NavDropdown.Divider />
                                     <NavDropdown.Item href="/logout">Logout</NavDropdown.Item>
                                 </NavDropdown>

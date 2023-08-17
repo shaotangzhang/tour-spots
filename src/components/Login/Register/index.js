@@ -26,7 +26,7 @@ const Register = ({ redirect }) => {
                 setRegisterResult('Successfully registered.');
 
                 if (!redirect) {
-                    redirect = '/user';
+                    redirect = '/login';
                 }
 
                 if (typeof redirect === 'string') {
@@ -38,7 +38,7 @@ const Register = ({ redirect }) => {
     };
 
     return (
-        <div className="container bg-light p-5 mt-3">
+        <div className="container py-5">
             <div className="row justify-content-center m-3">
                 <div className="col-md-6">
                     <h2 className="mb-4">User Registration</h2>

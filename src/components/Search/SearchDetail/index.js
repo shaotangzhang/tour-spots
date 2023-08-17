@@ -13,6 +13,47 @@ function formatTitle(place) {
     return title || place?.name || place?.title;
 }
 
+function isEnglishText(text) {
+    const englishCharCount = [...text].reduce((count, char) => {
+      const charCode = char.charCodeAt(0);
+      return count + (charCode >= 0 && charCode <= 127 ? 1 : 0);
+    }, 0);
+  
+    return englishCharCount / text.length > 0.5;
+  }
+
+function analyzeText(text) {
+    const words = text.toLowerCase().split(/\s+/);
+
+    const wordCount = {};
+    words.forEach(word => {
+        if (word in wordCount) {
+            wordCount[word]++;
+        } else {
+            wordCount[word] = 1;
+        }
+    });
+
+    const commonWords = ['of', 'the', 'and', 'in', 'to', 'a', 'is', /* ... */];
+
+    const commonWordCount = Object.keys(wordCount)
+        .filter(word => commonWords.includes(word))
+        .reduce((total, word) => total + wordCount[word], 0);
+
+    const englishRatio = commonWordCount / words.length;
+    return englishRatio > 0.5;
+}
+
+function translateLink(text, key) {
+    if (!analyzeText(text)) {
+        return <div className="my-3" key={key}>
+            <a href={`https://translate.google.com/?sl=auto&tl=en&op=translate&text=${encodeURIComponent(text)}`} target="_blank">
+                <small>Translate this text</small>
+            </a>
+        </div>;
+    }
+}
+
 export default function SearchDetail({ xid, onLoad, onError }) {
 
     const params = useParams();
@@ -83,6 +124,8 @@ export default function SearchDetail({ xid, onLoad, onError }) {
         dialog?.current.close();
     }
 
+    let description;
+
     return place?.xid ? <>
         <div className="bg-light p-4 mb-3" data-testid={place?.xid}>
             <div className="container">
@@ -90,32 +133,37 @@ export default function SearchDetail({ xid, onLoad, onError }) {
                     <FavourButton item={place}></FavourButton>
                 </div>
 
-                <div className="d-flex justify-content-start align-items-center">
+                <section className="d-flex justify-content-start align-items-center" aria-label="Introduction">
                     {
                         place?.preview?.source ? <img src={place?.preview?.source} alt={formatTitle(place)} className="img-thumbnail me-5" style={{ height: 200, maxWidth: 400 }} /> : ''
                     }
-                    <div className="flex-grow-1">
-                        <h3>{formatTitle(place)}</h3>
+                    <section className="flex-grow-1" aria-label="Spot entries">
+                        <h3 aria-label="Title">{formatTitle(place)}</h3>
                         <address>
                             {place?.address?.suburb} {place?.address?.state} {place?.address?.postcode} <br />
                             {place?.address?.country}
                         </address>
-                        <p>Rate: {place?.rate}</p>
-                        <p>{place?.point?.lon}, {place?.point?.lat}</p>
-                    </div>
-                </div>
+                        <div>Rate: <em aria-label="status">{place?.rate}</em></div>
+                    </section>
+                </section>
             </div>
         </div>
 
         <div className="container">
 
-            <section className="mb-3 pb-3 border-bottom">
+            <section className="mb-3 pb-3 border-bottom" aria-label="Information">
                 <h4 className="mb-3">Information</h4>
-
-                {(place?.info || place?.wikipedia_extracts?.text || '').replace(/[\r\n]+/, '<br />')}
+                {
+                    (description = place?.info || place?.wikipedia_extracts?.text || '')
+                        ? [
+                            description.replace(/[\r\n]+/, '<br />'),
+                            translateLink(description, 1)
+                        ]
+                        : ''
+                }
             </section>
 
-            <section className="mb-3 pb-3 border-bottom">
+            <section className="mb-3 pb-3 border-bottom" aria-label="Categories">
                 <h4 className="mb-3">Categories</h4>
                 <p>{
 
@@ -126,11 +174,11 @@ export default function SearchDetail({ xid, onLoad, onError }) {
                 }</p>
             </section>
 
-            <section className="mb-3 pb-3 border-bottom">
+            <section className="mb-3 pb-3 border-bottom" aria-label="Gallery">
                 <h4 className="mb-3">Gallery</h4>
                 <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3">
                     {
-                        (gallery || []).filter(item=>item.preview || item.url).map(item => <div key={item.id} className="col card border-0 h-100 mb-3" itemScope>
+                        (gallery || []).filter(item => item.preview || item.url).map(item => <div key={item.id} className="col card border-0 h-100 mb-3" itemScope>
                             <div className="card-img-top text-decoration-none w-100 ratio ratio-1x1" tabIndex={0} style={{
                                 backgroundImage: `url(${item.preview || item.url})`,
                                 backgroundRepeat: false,
@@ -148,7 +196,7 @@ export default function SearchDetail({ xid, onLoad, onError }) {
                     <span role="status">Searching...</span>
                 </div>
 
-                <div className='p-3' hidden={galleryLoading || (gallery && (gallery.length >= galleryTotal)) || (galleryRange>25000)}>
+                <div className='p-3' hidden={galleryLoading || (gallery && (gallery.length >= galleryTotal)) || (galleryRange > 25000)}>
                     <button className="btn btn-light text-dark d-block w-75 mx-auto" type="button" onClick={handleGalleryLoadMore}>Explore more (+ {galleryRange / 1000} km)</button>
                 </div>
 

@@ -63,7 +63,6 @@ async function searchAround(place, { radius, kinds, limit, page }, sorting, filt
             items.sort(sorting);
         }
 
-        console.log(limit);
         result.total = items.length;
         result.items = items.slice((page - 1) * limit, page * limit);
     }

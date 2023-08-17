@@ -41,7 +41,7 @@ const Login = observer(({ redirectUrl, onSuccess, ...rest }) => {
 
     return success
         ? <User path={redirectUrl} {...rest}></User>
-        : <div className="container bg-light p-5 mt-3">
+        : <div className="container py-5">
             <div className="row justify-content-center m-3">
                 <div className="col-md-6">
                     <h2 className="mb-4">User Login</h2>
